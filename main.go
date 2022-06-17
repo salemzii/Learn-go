@@ -1,47 +1,51 @@
-package main
+package main 
 
 import (
 	"fmt"
 )
 
-type user struct {
-	name    string
-	email   string
-	isAdmin bool
-}
 
-func (u user) isAdminUser() bool {
+type notifier interface {
 
-	return u.isAdmin
-}
-
-func (u user) GetName() string {
-
-	return u.name
-}
-
-func (u *user) notify() {
-	fmt.Printf("Sending user email to %s<%s>\n", u.name, u.email)
-}
-
-type NameLs interface {
-	GetName() string
 	notify()
 }
 
-func main() {
-	u := user{name: "salem", email: "salem,.com"}
-	sendNotification(&u)
+type user struct{
+	name string
+	email string
+}
+
+func (u *user)notify(){
+	fmt.Printf("Sending user email to %s<%s>\n", u.name, u.email)
+}
+
+type admin struct {
+	user 
+	level string
+}
+
+func (a *admin) notify() { 
+	fmt.Printf("Sending admin email to %s<%s>\n", a.name, a.email) 
 }
 
 
-func GetEntName(ent NameLs) string {
-
-	return ent.GetName()
+func sendNotification(n notifier) {
+	n.notify()
 }
 
+func main(){
 
-func sendNotification(ent NameLs) {
+	ad := admin{
+		user: user{
+			name: "john smith",
+			email: "john@yahoo.com",
+		},
+		level: "super",
+	}
+	defer ad.notify()
 
-	ent.notify()
+	n := new(int)
+	*n = 10
+
+	fmt.Println(*n)
 }

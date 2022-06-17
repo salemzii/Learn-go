@@ -117,3 +117,85 @@ Example:
 	```
 
 Because it’s not always possible to get the address of a value, the method set for a value only includes methods that are implemented with a value receiver.
+
+
+## 5.5 Type embedding
+
+Example: 
+
+	```go 
+
+		package main 
+
+		import (
+			"fmt"
+		)
+
+
+		type notifier interface {
+
+			notify()
+		}
+
+		type user struct{
+			name string
+			email string
+		}
+
+		func (u *user)notify(){
+			fmt.Printf("Sending user email to %s<%s>\n", u.name, u.email)
+		}
+
+		type admin struct {
+			user 
+			level string
+		}
+
+
+		func sendNotification(n notifier) {
+			n.notify()
+		}
+
+		func main(){
+
+			ad := admin{
+				user: user{
+					name: "john smith",
+					email: "john@yahoo.com",
+				},
+				level: "super",
+			}
+
+			sendNotification(&ad)
+		}
+
+	```
+Thanks to inner type promotion, the implementation of the interface by the inner type has been promoted up to the outer type. That means the outer type now implements the interface, thanks to the inner type’s implementation.
+
+What if the outer type wants to implement a similar implementation of the inner type?
+
+	```go 
+		type admin struct {
+			user 
+			level string
+		}
+
+		func (a *admin) notify() { 
+			fmt.Printf("Sending admin email to %s<%s>\n", a.name, a.email) 
+		}
+	```
+
+In cases like this, the (u *user).notify() implementation is not promoted, therefore the (a *admin).notify() method can be directly accessed when passed to an interface. In case where there's also a need to pass in the user.notify() implementation, this can be done by passing the user type to the interface e.g `sendNotification(&ad.user)` will send notification for user type.
+
+
+## 5.6 Exporting and unexporting identifiers 
+The ability to apply visibility rules to the identifiers you declare is critical for good API design. Go supports the exporting and unexporting of identifiers from a package to provide this functionality.
+
+
+5.7 Summary 
+	. User-defined types can be declared using the keyword struct or by specifying an existing type. 
+	. Methods provide a way to add behavior to user-defined types. 
+	. Think of types as having one of two natures, primitive or non-primitive. 
+	. Interfaces are types that declare behavior and provide polymorphism. 
+	. Type embedding provides the ability to extend types without the need for inheritance. 
+	. Identifiers are either exported or unexported from packages.
