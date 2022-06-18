@@ -2,50 +2,59 @@ package main
 
 import (
 	"fmt"
+	"runtime"
+	"sync"
 )
 
 
-type notifier interface {
+var (
+	wg sync.WaitGroup
+	counter int
+)
 
-	notify()
-}
-
-type user struct{
-	name string
-	email string
-}
-
-func (u *user)notify(){
-	fmt.Printf("Sending user email to %s<%s>\n", u.name, u.email)
-}
-
-type admin struct {
-	user 
-	level string
-}
-
-func (a *admin) notify() { 
-	fmt.Printf("Sending admin email to %s<%s>\n", a.name, a.email) 
-}
-
-
-func sendNotification(n notifier) {
-	n.notify()
-}
 
 func main(){
+	runtime.GOMAXPROCS(1)
+	
+	wg.Add(2)
+	fmt.Println("Start goroutines")
+	fmt.Println("Value of counter: ", counter)
 
-	ad := admin{
-		user: user{
-			name: "john smith",
-			email: "john@yahoo.com",
-		},
-		level: "super",
+	go incCouter(1)
+	go incCouter(2)
+
+	fmt.Println("waiting to finish")
+	wg.Wait()
+	fmt.Println("Final counter: ", counter)
+}
+
+
+func incCouter(id int){
+
+	defer wg.Done()
+
+	for count := 0; count < 2; count++ {
+		value := counter
+
+		runtime.Gosched()
+
+		value++
+		counter = value
 	}
-	defer ad.notify()
 
-	n := new(int)
-	*n = 10
+}
 
-	fmt.Println(*n)
+func printPrime(prefix string){
+	defer wg.Done()
+
+next:
+	for outer := 2; outer < 5000; outer++ {
+		for inner := 2; inner < outer; inner++ {
+			if outer%inner == 0 {
+				continue next
+			}
+		}
+		fmt.Printf("%s:%d\n", prefix, outer)
+	}
+	fmt.Println("Completed", prefix)
 }

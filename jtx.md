@@ -199,3 +199,35 @@ The ability to apply visibility rules to the identifiers you declare is critical
 	. Interfaces are types that declare behavior and provide polymorphism. 
 	. Type embedding provides the ability to extend types without the need for inheritance. 
 	. Identifiers are either exported or unexported from packages.
+
+
+# Concurrency
+
+Concurrency in Go is the ability for functions to run independent of each other.
+When a function is created as a goroutine, it’s treated as an independent unit of work that gets scheduled and then executed on an available logical processor.
+
+Concurrency synchronization comes from a paradigm called communicating sequential processes or CSP. CSP is a message-passing model that works by communicating data between goroutines instead of locking data to synchronize access. The key data type for synchronizing and passing messages between goroutines is called a channel.
+
+## 6.1 Concurrency vs Parallelism
+
+A thread is a path of execution that’s scheduled by the operating system to run the code that you write in your functions.
+
+The operating system schedules threads to run against physical processors and the Go runtime schedules goroutines to run against logical processors.
+
+Concurrency is not parallelism. Parallelism can only be achieved when multiple pieces of code are executing simultaneously against different physical processors. Par- allelism is about doing a lot of things at once. Concurrency is about managing a lot of things at once
+
+
+## Goroutines
+A WaitGroup is a counting semaphore that can be used to maintain a record of run- ning goroutines. When the value of a WaitGroup is greater than zero, the Wait method will block.
+
+Based on the internal algorithms of the scheduler, a running goroutine can be stopped and rescheduled to run again before it finishes its work.
+
+Goroutines can only run in parallel if there’s more than one logical processor and there’s a physical processor available to run each goroutine simultaneously.
+
+## Race Conditions 
+
+When two or more goroutines have unsynchronized access to a shared resource and attempt to read and write to that resource at the same time, you have what’s called a race condition. Race conditions are the reason concurrent programming is compli- cated and has a greater potential for bugs. Read and write operations against a shared resource must always be atomic, or in other words, done by only one gorou- tine at a time.
+
+Go has a special tool that can detect race conditions in your code. It’s extremely useful to find these types of bugs, especially when they’re not obvious. To use this built-in feature, run 
+
+`go run -race <NAME_OF_FILE>`
