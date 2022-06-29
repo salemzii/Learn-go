@@ -231,3 +231,33 @@ When two or more goroutines have unsynchronized access to a shared resource and 
 Go has a special tool that can detect race conditions in your code. It’s extremely useful to find these types of bugs, especially when they’re not obvious. To use this built-in feature, run 
 
 `go run -race <NAME_OF_FILE>`
+
+
+One way we can fix and eliminate the race condition is by using the support Go has for synchronizing goroutines by locking down shared resources.
+
+Another way to synchronize access to a shared resource is by using a mutex. A mutex is named after the concept of mutual exclusion. A mutex is used to create a critical section around code that ensures only one goroutine at a time can execute that code section.
+
+When a resource needs to be shared between goroutines, channels act as a conduit between the goroutines and provide a mechanism that guarantees a synchronous exchange.
+
+When declaring a channel, the type of data that will be shared needs to be specified. Values and pointers of built-in, named, struct, and reference types can be shared through a channel.
+
+An unbuffered channel is a channel with no capacity to hold any value before it’s received.
+
+A buffered channel is a channel with capacity to hold one or more values before they’re received.
+
+In buffered channels there are certain conditions where a send or recieve operation will block.
+
+A receive operation will block if there are no values in the channel to be retrieved. 
+
+A send operation will block if there’s no available buffer to place the value being sent.
+
+When a channel is closed, goroutines can still recieves from the channel but can no longer send to the channel.
+
+6.6 Summary 
+	. Concurrency is the independent execution of goroutines. 
+	. Functions are created as goroutines with the keyword go. 
+	. Goroutines are executed within the scope of a logical processor that owns a sin- gle operating system thread and run queue. 
+	. A race condition is when two or more goroutines attempt to access the same resource. 
+	. Atomic functions and mutexes provide a way to protect against race conditions. 
+	. Channels provide an intrinsic way to safely share data between two goroutines. 
+	. Unbuffered channels provide a guarantee between an exchange of data. Buff- ered channels do not.
